@@ -1,0 +1,77 @@
+"use client";
+
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
+
+const COLORS = {
+  Critical: "var(--risk-critical)",
+  High:     "var(--risk-high)",
+  Medium:   "var(--risk-medium)",
+  Low:      "var(--risk-low)",
+};
+
+const DATA = [
+  { name: "Critical", value: 8 },
+  { name: "High",     value: 23 },
+  { name: "Medium",   value: 61 },
+  { name: "Low",      value: 104 },
+];
+
+interface CustomLabelProps {
+  cx?: number; cy?: number; midAngle?: number;
+  innerRadius?: number; outerRadius?: number; percent?: number;
+}
+
+function CustomLabel({ cx = 0, cy = 0, midAngle = 0, innerRadius = 0, outerRadius = 0, percent = 0 }: CustomLabelProps) {
+  if (percent < 0.06) return null;
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  return (
+    <text x={x} y={y} fill="#fff" textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight={600}>
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+}
+
+export function RiskPieChart() {
+  return (
+    <ResponsiveContainer width="100%" height={240}>
+      <PieChart>
+        <Pie
+          data={DATA}
+          cx="50%"
+          cy="50%"
+          innerRadius={55}
+          outerRadius={95}
+          dataKey="value"
+          labelLine={false}
+          label={CustomLabel}
+          strokeWidth={2}
+          stroke="var(--bg-card)"
+        >
+          {DATA.map((entry) => (
+            <Cell key={entry.name} fill={COLORS[entry.name as keyof typeof COLORS]} />
+          ))}
+        </Pie>
+        <Tooltip
+          contentStyle={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 13 }}
+          labelStyle={{ color: "var(--text-primary)" }}
+          itemStyle={{ color: "var(--text-secondary)" }}
+        />
+        <Legend
+          iconType="circle"
+          iconSize={8}
+          wrapperStyle={{ fontSize: 12 }}
+        />
+      </PieChart>
+    </ResponsiveContainer>
+  );
+}
