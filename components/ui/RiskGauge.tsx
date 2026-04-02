@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { getCombinedScore } from "@/components/ui/Badge";
 
 interface RiskGaugeProps {
   cvss: number;   // 0–10
@@ -11,11 +12,9 @@ interface RiskGaugeProps {
 
 /**
  * Semi-circle gauge visualizing combined risk score.
- * Combined = CVSS * 0.5 + EPSS*10 * 0.3 + (KEV ? 10 : 0) * 0.2
- * Result normalized to 0–10
  */
 export function RiskGauge({ cvss, epss, kev, size = 160 }: RiskGaugeProps) {
-  const combined = Math.min(10, cvss * 0.5 + epss * 10 * 0.3 + (kev ? 10 : 0) * 0.2);
+  const combined = getCombinedScore(cvss, epss, kev);
   const combinedPct = combined / 10; // 0–1
 
   const r = size * 0.38;
@@ -51,8 +50,8 @@ export function RiskGauge({ cvss, epss, kev, size = 160 }: RiskGaugeProps) {
     combined >= 4 ? "Medium" : "Low";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-      <svg width={size} height={size * 0.65} viewBox={`0 0 ${size} ${size * 0.65}`}>
+    <div className="flex flex-col items-center gap-3">
+      <svg width={size} height={size * 0.75} viewBox={`0 0 ${size} ${size * 0.65}`} className="-translate-y-3">
         {/* Track */}
         <path d={trackPath} fill="none" stroke="var(--border)" strokeWidth={size * 0.07} strokeLinecap="round" />
         {/* Filled */}
@@ -68,33 +67,24 @@ export function RiskGauge({ cvss, epss, kev, size = 160 }: RiskGaugeProps) {
       </svg>
 
       {/* Score breakdown pills */}
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center" }}>
-        <ScorePill label="CVSS" value={cvss.toFixed(1)} color="var(--accent-blue)" />
-        <ScorePill label="EPSS" value={(epss * 100).toFixed(1) + "%"} color="var(--accent-cyan)" />
-        <ScorePill label="KEV" value={kev ? "Yes" : "No"} color={kev ? "var(--risk-critical)" : "var(--text-muted)"} />
+      <div className="flex gap-2 flex-wrap justify-center">
+        <ScorePill label="CVSS" value={cvss.toFixed(1)} colorClass="text-accent-blue" />
+        <ScorePill label="EPSS" value={(epss * 100).toFixed(1) + "%"} colorClass="text-accent-cyan" />
+        <ScorePill label="KEV" value={kev ? "Yes" : "No"} colorClass={kev ? "text-risk-critical" : "text-text-muted"} />
       </div>
 
-      <span style={{ fontSize: 13, fontWeight: 700, color, letterSpacing: 1, textTransform: "uppercase" }}>
+      <span className="text-[13px] font-bold tracking-[1px] uppercase" style={{ color }}>
         {label} Risk
       </span>
     </div>
   );
 }
 
-function ScorePill({ label, value, color }: { label: string; value: string; color: string }) {
+function ScorePill({ label, value, colorClass }: { label: string; value: string; colorClass: string }) {
   return (
-    <div style={{
-      background: "var(--bg-surface)",
-      border: "1px solid var(--border)",
-      borderRadius: 999,
-      padding: "3px 10px",
-      display: "flex",
-      gap: 5,
-      alignItems: "center",
-      fontSize: 12,
-    }}>
-      <span style={{ color: "var(--text-muted)" }}>{label}</span>
-      <span style={{ color, fontWeight: 700 }}>{value}</span>
+    <div className="bg-bg-surface border border-border rounded-full px-2.5 py-1 flex items-center gap-1.5 text-xs">
+      <span className="text-text-muted">{label}</span>
+      <span className={`font-bold ${colorClass}`}>{value}</span>
     </div>
   );
 }

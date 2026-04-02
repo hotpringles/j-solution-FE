@@ -28,3 +28,7 @@ export function levelFromScore(score: number): BadgeProps["level"] {
   if (score > 0)    return "low";
   return "info";
 }
+
+export function getCombinedScore(cvss: number, epss: number, kev: boolean): number {
+  return Math.min(10, cvss * 0.5 + epss * 10 * 0.3 + (kev ? 10 : 0) * 0.2);
+}

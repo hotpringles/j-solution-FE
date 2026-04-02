@@ -20,57 +20,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", background: "var(--bg-base)", overflow: "hidden" }}>
+    <div className="flex h-screen bg-bg-base overflow-hidden">
       {/* === SIDEBAR === */}
-      <aside style={{
-        width: 224,
-        minWidth: 224,
-        background: "var(--bg-surface)",
-        borderRight: "1px solid var(--border)",
-        display: "flex",
-        flexDirection: "column",
-      }}>
+      <aside className="w-56 min-w-56 bg-bg-surface border-r border-border flex flex-col">
         {/* Logo */}
-        <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid var(--border)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: 8,
-              background: "linear-gradient(135deg, #00C7A9, #00a88e)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 16, fontWeight: 900, color: "#0d1117",
-            }}>⬡</div>
+        <div className="p-5 pb-4 border-b border-border">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#00C7A9] to-[#00a88e] flex items-center justify-center text-base font-black text-[#0d1117]">
+              ⬡
+            </div>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", letterSpacing: 0.5 }}>
+              <div className="text-[13px] font-bold text-text-primary tracking-wide">
                 Security Assistant
               </div>
-              <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 1 }}>Risk Mangagement.</div>
+              <div className="text-[10px] text-text-muted mt-0.5">Risk Management.</div>
             </div>
           </div>
         </div>
 
         {/* Nav */}
-        <nav style={{ flex: 1, padding: "12px 10px", display: "flex", flexDirection: "column", gap: 2 }}>
-          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: 1.2, color: "var(--text-muted)", padding: "6px 10px 4px", textTransform: "uppercase" }}>
+        <nav className="flex-1 p-3 flex flex-col gap-0.5">
+          <div className="text-[10px] font-semibold tracking-wider text-text-muted px-2.5 pt-1.5 pb-1 uppercase">
             Menu
           </div>
           {NAV_ITEMS.map(({ href, icon, label }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
-              <Link key={href} href={href} style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                padding: "9px 12px",
-                borderRadius: 8,
-                textDecoration: "none",
-                fontSize: 13,
-                fontWeight: active ? 600 : 400,
-                color: active ? "var(--text-primary)" : "var(--text-secondary)",
-                background: active ? "var(--bg-hover)" : "transparent",
-                borderLeft: active ? "2px solid var(--accent-cyan)" : "2px solid transparent",
-                transition: "all 0.15s",
-              }}>
-                <span style={{ fontSize: 15 }}>{icon}</span>
+              <Link key={href} href={href} className={`
+                flex items-center gap-2.5 px-3 py-2 rounded-lg no-underline text-[13px] transition-all duration-150
+                ${active 
+                  ? "font-semibold text-text-primary bg-bg-hover border-l-2 border-accent-cyan" 
+                  : "font-normal text-text-secondary bg-transparent border-l-2 border-transparent hover:bg-bg-hover hover:text-text-primary"}
+              `}>
+                <span className="text-[15px]">{icon}</span>
                 {label}
               </Link>
             );
@@ -78,39 +60,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         {/* Bottom / Status */}
-        <div style={{ padding: "12px 10px", borderTop: "1px solid var(--border)" }}>
+        <div className="p-3 border-t border-border">
           {/* Scan status pill */}
-          <div style={{
-            background: "rgba(82,196,26,0.08)",
-            border: "1px solid rgba(82,196,26,0.2)",
-            borderRadius: 8,
-            padding: "8px 12px",
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            marginBottom: 8,
-          }}>
-            <span style={{
-              width: 6, height: 6, borderRadius: "50%", background: "var(--risk-low)",
-              boxShadow: "0 0 0 2px rgba(82,196,26,0.3)",
-              animation: "pulse-glow 2s infinite",
-            }} />
-            <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>Scanner Online</span>
+          <div className="bg-[rgba(82,196,26,0.08)] border border-[rgba(82,196,26,0.2)] rounded-lg py-2 px-3 flex items-center gap-2 mb-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-risk-low shadow-[0_0_0_2px_rgba(82,196,26,0.3)] animate-[pulse-glow_2s_infinite]" />
+            <span className="text-[11px] text-text-secondary">Scanner Online</span>
           </div>
 
-          <button onClick={handleLogout} style={{
-            width: "100%",
-            padding: "8px",
-            background: "transparent",
-            border: "1px solid var(--border)",
-            borderRadius: 8,
-            color: "var(--text-muted)",
-            fontSize: 12,
-            cursor: "pointer",
-            transition: "color 0.15s, border-color 0.15s",
-          }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--risk-critical)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,77,79,0.4)"; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--text-muted)"; (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"; }}
+          <button 
+            onClick={handleLogout} 
+            className="w-full p-2 bg-transparent border border-border rounded-lg text-text-muted text-xs cursor-pointer transition-colors duration-150 hover:text-risk-critical hover:border-[rgba(255,77,79,0.4)]"
           >
             로그아웃
           </button>
@@ -118,44 +77,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* === MAIN === */}
-      <main style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <main className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
-        <header style={{
-          height: 56,
-          minHeight: 56,
-          background: "var(--bg-surface)",
-          borderBottom: "1px solid var(--border)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 24px",
-        }}>
-          <div style={{ fontSize: 13, color: "var(--text-muted)" }}>
-            Last scan: <span style={{ color: "var(--text-secondary)" }}>2026-03-27 18:30 KST</span>
+        <header className="h-14 min-h-14 bg-bg-surface border-b border-border flex items-center justify-between px-6">
+          <div className="text-[13px] text-text-muted">
+            Last scan: <span className="text-text-secondary">2026-03-27 18:30 KST</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{
-              padding: "4px 12px",
-              background: "rgba(255,77,79,0.1)",
-              border: "1px solid rgba(255,77,79,0.25)",
-              borderRadius: 999,
-              fontSize: 12,
-              color: "var(--risk-critical)",
-              fontWeight: 600,
-              animation: "pulse-glow 2.5s infinite",
-            }}>
+          <div className="flex items-center gap-2.5">
+            <div className="px-3 py-1 bg-[rgba(255,77,79,0.1)] border border-[rgba(255,77,79,0.25)] rounded-full text-xs text-risk-critical font-semibold animate-[pulse-glow_2.5s_infinite]">
               ● 8 Critical
             </div>
-            <div style={{
-              width: 30, height: 30, borderRadius: "50%",
-              background: "linear-gradient(135deg, #00C7A9, #00a88e)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 12, fontWeight: 700, color: "#fff",
-            }}>A</div>
+            <div className="w-7.5 h-7.5 rounded-full bg-gradient-to-br from-[#00C7A9] to-[#00a88e] flex items-center justify-center text-xs font-bold text-white">
+              A
+            </div>
           </div>
         </header>
 
-        <div style={{ flex: 1, overflowY: "auto", padding: "24px", display: "flex", flexDirection: "column", gap: 20 }}>
+        <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-5">
           {children}
         </div>
       </main>

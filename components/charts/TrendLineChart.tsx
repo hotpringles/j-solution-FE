@@ -20,6 +20,24 @@ const DATA = [
   { date: "03/27", critical: 8,  high: 23, medium: 61 },
 ];
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-bg-surface border border-border rounded-lg text-[13px] p-2.5 shadow-md">
+        <p className="m-0 mb-2 font-bold text-text-primary">{label}</p>
+        {payload.map((entry: any, index: number) => (
+          <div key={index} className="flex items-center gap-2 mt-1 text-text-secondary">
+            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
+            <span className="capitalize">{entry.name}:</span>
+            <span className="font-bold" style={{ color: entry.color }}>{entry.value}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
+
 export function TrendLineChart() {
   return (
     <ResponsiveContainer width="100%" height={240}>
@@ -27,11 +45,7 @@ export function TrendLineChart() {
         <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
         <XAxis dataKey="date" tick={{ fill: "var(--text-muted)", fontSize: 11 }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fill: "var(--text-muted)", fontSize: 11 }} axisLine={false} tickLine={false} />
-        <Tooltip
-          contentStyle={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 13 }}
-          labelStyle={{ color: "var(--text-primary)" }}
-          itemStyle={{ color: "var(--text-secondary)" }}
-        />
+        <Tooltip content={<CustomTooltip />} />
         <Legend
           iconType="circle"
           iconSize={8}

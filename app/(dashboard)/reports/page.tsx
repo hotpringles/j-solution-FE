@@ -75,41 +75,36 @@ export default function ReportsPage() {
   return (
     <>
       <div>
-        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: "var(--text-primary)" }}>AI Reports</h1>
-        <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--text-muted)" }}>Gemini 기반 보안 보고서 자동 생성 및 대응 가이드</p>
+        <h1 className="m-0 text-[22px] font-bold text-text-primary">AI Reports</h1>
+        <p className="mt-1 mb-0 text-[13px] text-text-muted">Gemini 기반 보안 보고서 자동 생성 및 대응 가이드</p>
       </div>
 
       {/* Control Panel */}
       <Card>
         <CardHeader title="보고서 생성 설정" />
-        <div style={{ display: "flex", gap: 12, alignItems: "flex-end" }}>
-          <div style={{ flex: 1 }}>
-            <label style={{ display: "block", fontSize: 11, color: "var(--text-muted)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.8 }}>
+        <div className="flex gap-3 items-end">
+          <div className="flex-1">
+            <label className="block text-[11px] text-text-muted mb-1.5 uppercase tracking-[0.8px]">
               스캔 결과 선택
             </label>
             <select
               value={selectedScan}
               onChange={(e) => { setSelectedScan(e.target.value); setReport(null); }}
-              style={{
-                width: "100%", padding: "10px 14px",
-                background: "var(--bg-surface)", border: "1px solid var(--border)",
-                borderRadius: 8, color: "var(--text-primary)", fontSize: 14, outline: "none",
-              }}
+              className="w-full px-3.5 py-2.5 bg-bg-surface border border-border rounded-lg text-text-primary text-sm outline-none focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(88,166,255,0.1)] transition-all"
             >
               {SCANS.map((s) => (
-                <option key={s.id} value={s.id} style={{ background: "var(--bg-surface)" }}>{s.label}</option>
+                <option key={s.id} value={s.id} className="bg-bg-surface">{s.label}</option>
               ))}
             </select>
           </div>
           <button
-            className="btn-primary"
+            className={`btn-primary flex items-center justify-center gap-2 min-w-[160px] ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
             onClick={handleGenerate}
             disabled={loading}
-            style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 160, justifyContent: "center", opacity: loading ? 0.7 : 1 }}
           >
             {loading ? (
               <>
-                <span style={{ display: "inline-block", width: 14, height: 14, border: "2px solid rgba(0,0,0,0.3)", borderTopColor: "#0d1117", borderRadius: "50%", animation: "spin-slow 0.8s linear infinite" }} />
+                <span className="inline-block w-3.5 h-3.5 border-2 border-[rgba(0,0,0,0.3)] border-t-[#0d1117] rounded-full animate-spin-slow" />
                 생성 중...
               </>
             ) : (
@@ -119,45 +114,36 @@ export default function ReportsPage() {
         </div>
       </Card>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 16 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4">
         {/* Report Editor */}
         <Card>
           <CardHeader
             title="생성된 보고서 초안"
             subtitle={report ? "Gemini 1.5 Pro 생성" : "보고서를 생성하면 여기에 표시됩니다"}
             action={report ? (
-              <button className="btn-ghost" style={{ fontSize: 11 }} onClick={() => navigator.clipboard.writeText(report)}>
+              <button className="btn-ghost text-[11px] px-2.5 py-1.5" onClick={() => navigator.clipboard.writeText(report)}>
                 복사
               </button>
             ) : undefined}
           />
           {loading && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div className="flex flex-col gap-2.5">
               {[80, 60, 90, 50, 70].map((w, i) => (
-                <div key={i} className="skeleton" style={{ height: 16, width: `${w}%` }} />
+                <div key={i} className="skeleton h-4" style={{ width: `${w}%` }} />
               ))}
             </div>
           )}
           {!loading && !report && (
-            <div style={{
-              minHeight: 300, display: "flex", flexDirection: "column",
-              alignItems: "center", justifyContent: "center", gap: 12,
-              color: "var(--text-muted)", fontSize: 13,
-            }}>
-              <span style={{ fontSize: 36 }}>✦</span>
-              <p style={{ margin: 0 }}>스캔 결과를 선택하고 보고서 생성을 클릭하세요</p>
+            <div className="min-h-[300px] flex flex-col items-center justify-center gap-3 text-text-muted text-[13px]">
+              <span className="text-4xl text-accent-purple">✦</span>
+              <p className="m-0">스캔 결과를 선택하고 보고서 생성을 클릭하세요</p>
             </div>
           )}
           {report && !loading && (
             <textarea
               value={report}
               onChange={(e) => setReport(e.target.value)}
-              style={{
-                minHeight: 380, resize: "vertical", fontFamily: "monospace",
-                fontSize: 13, lineHeight: 1.8, padding: 16,
-                background: "var(--bg-surface)", border: "1px solid var(--border)",
-                borderRadius: 8, color: "var(--text-primary)", width: "100%",
-              }}
+              className="min-h-[380px] w-full resize-y font-mono text-[13px] leading-[1.8] p-4 bg-bg-surface border border-border rounded-lg text-text-primary focus:border-accent-blue focus:shadow-[0_0_0_3px_rgba(88,166,255,0.1)] transition-all"
             />
           )}
         </Card>
@@ -166,37 +152,26 @@ export default function ReportsPage() {
         <Card>
           <CardHeader title="대응 가이드" subtitle="Remediation Guide" />
           {remediation.length === 0 ? (
-            <p style={{ fontSize: 13, color: "var(--text-muted)" }}>보고서를 생성하면 대응 가이드가 표시됩니다.</p>
+            <p className="text-[13px] text-text-muted">보고서를 생성하면 대응 가이드가 표시됩니다.</p>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div className="flex flex-col gap-3">
               {remediation.map((item, i) => (
-                <div key={i} style={{
-                  background: "var(--bg-surface)", borderRadius: 8,
-                  border: "1px solid var(--border)", borderLeft: "3px solid var(--accent-blue)",
-                  padding: "12px 14px", display: "flex", gap: 10,
-                }}>
-                  <span style={{
-                    minWidth: 22, height: 22, borderRadius: "50%",
-                    background: "rgba(88,166,255,0.15)", color: "var(--accent-blue)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 11, fontWeight: 700,
-                  }}>{i + 1}</span>
-                  <p style={{ margin: 0, fontSize: 12, lineHeight: 1.7, color: "var(--text-secondary)" }}>{item}</p>
+                <div key={i} className="bg-bg-surface rounded-lg border border-border border-l-3 border-l-accent-blue py-3 px-3.5 flex gap-2.5">
+                  <span className="min-w-[22px] h-[22px] rounded-full bg-[rgba(88,166,255,0.15)] text-accent-blue flex items-center justify-center text-[11px] font-bold">
+                    {i + 1}
+                  </span>
+                  <p className="m-0 text-xs leading-[1.7] text-text-secondary">{item}</p>
                 </div>
               ))}
             </div>
           )}
 
           {/* Gemini badge */}
-          <div style={{
-            marginTop: 16, padding: "10px 14px",
-            background: "rgba(0,199,169,0.08)", border: "1px solid rgba(0,199,169,0.25)",
-            borderRadius: 8, display: "flex", alignItems: "center", gap: 8,
-          }}>
-            <span style={{ fontSize: 16 }}>✦</span>
+          <div className="mt-4 py-2.5 px-3.5 bg-[rgba(0,199,169,0.08)] border border-[rgba(0,199,169,0.25)] rounded-lg flex items-center gap-2">
+            <span className="text-base text-accent-purple">✦</span>
             <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--accent-purple)" }}>Powered by Gemini</div>
-              <div style={{ fontSize: 10, color: "var(--text-muted)" }}>AI 가이드는 참고용입니다. 전문가 검토 후 적용하세요.</div>
+              <div className="text-[11px] font-bold text-accent-purple">Powered by Gemini</div>
+              <div className="text-[10px] text-text-muted">AI 가이드는 참고용입니다. 전문가 검토 후 적용하세요.</div>
             </div>
           </div>
         </Card>

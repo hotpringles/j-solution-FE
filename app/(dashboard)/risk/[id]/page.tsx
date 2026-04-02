@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { RiskGauge } from "@/components/ui/RiskGauge";
-import { Badge, levelFromScore } from "@/components/ui/Badge";
+import { Badge, levelFromScore, getCombinedScore } from "@/components/ui/Badge";
 import { Card, CardHeader } from "@/components/ui/Card";
 
 const RISK_DATA: Record<string, {
@@ -36,6 +36,128 @@ const RISK_DATA: Record<string, {
       { id: "CVE-2024-3400", cvss: 9.1, summary: "OS Command Injection in PAN-OS GlobalProtect — unauthenticated RCE" },
     ],
   },
+  "3": {
+    asset: "gitlab.example.com", ip: "203.0.113.45", cvss: 8.7, epss: 0.41, kev: false,
+    cve: "CVE-2023-7028", service: "GitLab CE",
+    description: "GitLab 환경에서 사용자의 비밀번호 변경 메일이 인증되지 않은 주소로 발송될 수 있는 취약점(계정 탈취 가능성).",
+    ports: [
+      { port: 80,  protocol: "TCP", service: "HTTP", version: "Nginx", state: "open" },
+    ],
+    cveList: [
+      { id: "CVE-2023-7028", cvss: 8.7, summary: "Account Takeover via Password Reset without user interaction" },
+    ],
+  },
+  "4": {
+    asset: "smtp.example.com", ip: "203.0.113.67", cvss: 7.5, epss: 0.29, kev: false,
+    cve: "CVE-2024-1234", service: "Exim SMTP",
+    description: "Exim 메일 서버에서 메시지 검사 중 발생할 수 있는 메모리 손상 버그.",
+    ports: [
+      { port: 25,  protocol: "TCP", service: "SMTP", version: "Exim 4.96", state: "open" },
+    ],
+    cveList: [
+      { id: "CVE-2024-1234", cvss: 7.5, summary: "Memory corruption in message parsing" },
+    ],
+  },
+  "5": {
+    asset: "dev.example.com", ip: "10.0.1.15", cvss: 7.2, epss: 0.18, kev: false,
+    cve: "CVE-2023-5678", service: "Apache HTTP",
+    description: "오래된 버전의 Apache 서버에서 발견된 로컬 권한 상승(LPE) 및 DoS 취약점.",
+    ports: [
+      { port: 8080, protocol: "TCP", service: "HTTP-Alt", version: "Apache 2.4.40", state: "open" },
+    ],
+    cveList: [
+      { id: "CVE-2023-5678", cvss: 7.2, summary: "Local privilege escalation possible via symlinks" },
+    ],
+  },
+  "6": {
+    asset: "mail.example.com", ip: "203.0.113.80", cvss: 5.3, epss: 0.08, kev: false,
+    cve: "CVE-2023-9012", service: "Dovecot IMAP",
+    description: "IMAP 서버의 자원 소모성(Denial of Service) 취약점.",
+    ports: [
+      { port: 993, protocol: "TCP", service: "IMAPS", version: "Dovecot", state: "open" },
+    ],
+    cveList: [
+      { id: "CVE-2023-9012", cvss: 5.3, summary: "Resource exhaustion via multiple concurrent IMAP sessions" },
+    ],
+  },
+  "7": {
+    asset: "stage.example.com", ip: "10.0.1.20", cvss: 4.9, epss: 0.05, kev: false,
+    cve: "CVE-2023-3456", service: "Nginx",
+    description: "Nginx 설정의 미스컨피규레이션으로 인한 정보 노출(Information Disclosure) 위험.",
+    ports: [
+      { port: 443, protocol: "TCP", service: "HTTPS", version: "Nginx 1.22.0", state: "filtered" },
+    ],
+    cveList: [
+      { id: "CVE-2023-3456", cvss: 4.9, summary: "Information disclosure via detailed error messages" },
+    ],
+  },
+  "8": {
+    asset: "cdn.example.com", ip: "203.0.113.99", cvss: 3.2, epss: 0.02, kev: false,
+    cve: "CVE-2023-2345", service: "Cloudflare Worker",
+    description: "서드파티 워커 로직의 캐싱 이슈로 인한 단순 캐시 교란.",
+    ports: [
+      { port: 80, protocol: "TCP", service: "HTTP", version: "Cloudflare", state: "open" },
+    ],
+    cveList: [
+      { id: "CVE-2023-2345", cvss: 3.2, summary: "Low-impact cache poisoning vulnerability" },
+    ],
+  },
+  "9": {
+    asset: "auth.example.com", ip: "10.0.1.22", cvss: 3.1, epss: 0.01, kev: false,
+    cve: "CVE-2023-1212", service: "OAuth Proxy",
+    description: "OAuth 인증 프록시에서 만료된 토큰이 리다이렉트되는 중 리퍼러 정보에 유출되는 현상.",
+    ports: [
+      { port: 443, protocol: "TCP", service: "HTTPS", version: "OAuth2 Proxy", state: "open" },
+    ],
+    cveList: [
+      { id: "CVE-2023-1212", cvss: 3.1, summary: "Information exposure via HTTP Referer header" },
+    ],
+  },
+  "10": {
+    asset: "files.example.com", ip: "203.0.113.11", cvss: 2.1, epss: 0.01, kev: false,
+    cve: "CVE-2023-0001", service: "Samba",
+    description: "매우 한정된 환경에서의 Samba 경로 오류. 실질적인 외부 타격 가능성은 희박함.",
+    ports: [
+      { port: 445, protocol: "TCP", service: "SMB", version: "Samba 4.10", state: "open" },
+    ],
+    cveList: [
+      { id: "CVE-2023-0001", cvss: 2.1, summary: "Minor edge case in parsing symbolic links" },
+    ],
+  },
+  "11": {
+    asset: "proxy.example.com", ip: "203.0.113.19", cvss: 8.2, epss: 0.65, kev: true,
+    cve: "CVE-2024-5555", service: "HAProxy",
+    description: "HTTP Request Smuggling 취약점으로, 악의적인 페이로드를 숨겨 내부 망의 다른 서버를 우회 타격할 수 있음. CISA KEV 등재됨.",
+    ports: [
+      { port: 443, protocol: "TCP", service: "HTTPS", version: "HAProxy 2.4", state: "open" },
+      { port: 80, protocol: "TCP", service: "HTTP", version: "HAProxy 2.4", state: "open" },
+    ],
+    cveList: [
+      { id: "CVE-2024-5555", cvss: 8.2, summary: "HTTP Request Smuggling leading to internal service bypass" },
+    ],
+  },
+  "12": {
+    asset: "backup.example.com", ip: "10.0.1.66", cvss: 6.8, epss: 0.12, kev: false,
+    cve: "CVE-2023-4444", service: "Rsync",
+    description: "잘못된 권한 설정으로 인해 익명 유저가 백업 모듈 리스트를 열람할 수 있는 상태.",
+    ports: [
+      { port: 873, protocol: "TCP", service: "Rsync", version: "Rsync 3.1", state: "open" },
+    ],
+    cveList: [
+      { id: "CVE-2023-4444", cvss: 6.8, summary: "Insecure module configuration exposing backup lists" },
+    ],
+  },
+  "13": {
+    asset: "test.example.com", ip: "203.0.113.88", cvss: 4.5, epss: 0.04, kev: false,
+    cve: "CVE-2023-8888", service: "Node.js",
+    description: "개발용 Node.js 환경에서 디버깅 포트가 외부에 노출되어 있어 코드 주입 등 2차 타격 위험 존재.",
+    ports: [
+      { port: 9229, protocol: "TCP", service: "Node Debug", version: "V8 Inspector", state: "open" },
+    ],
+    cveList: [
+      { id: "CVE-2023-8888", cvss: 4.5, summary: "V8 Inspector protocol exposed leading to code injection vectors" },
+    ],
+  },
 };
 
 export default async function RiskDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -43,37 +165,38 @@ export default async function RiskDetailPage({ params }: { params: Promise<{ id:
   const data = RISK_DATA[id];
   if (!data) notFound();
 
+  const finalScore = getCombinedScore(data.cvss, data.epss, data.kev);
+
   return (
     <>
       {/* Breadcrumb */}
-      <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-muted)" }}>
-        <Link href="/risk" style={{ color: "var(--accent-blue)", textDecoration: "none" }}>Risk Analysis</Link>
+      <div className="flex items-center gap-1.5 text-xs text-text-muted">
+        <Link href="/risk" className="text-accent-blue no-underline hover:text-accent-cyan">Risk Analysis</Link>
         <span>/</span>
-        <span style={{ color: "var(--text-secondary)" }}>{data.asset}</span>
+        <span className="text-text-secondary">{data.asset}</span>
       </div>
 
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+      <div className="flex items-start justify-between">
         <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: "var(--text-primary)" }}>{data.asset}</h1>
-          <div style={{ display: "flex", gap: 8, marginTop: 6, alignItems: "center" }}>
-            <Badge level={levelFromScore(data.cvss)} />
-            <span style={{ fontSize: 12, fontFamily: "monospace", color: "var(--accent-blue)" }}>{data.cve}</span>
-            <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{data.service}</span>
+          <h1 className="m-0 text-[22px] font-bold text-text-primary">{data.asset}</h1>
+          <div className="flex gap-2 mt-1.5 items-center">
+            <Badge level={levelFromScore(finalScore)} />
+            <span className="text-xs font-mono text-accent-blue">{data.cve}</span>
+            <span className="text-xs text-text-muted">{data.service}</span>
           </div>
         </div>
-        <Link href="/reports" style={{
-          padding: "8px 16px", background: "rgba(88,166,255,0.1)",
-          border: "1px solid rgba(88,166,255,0.3)", borderRadius: 8,
-          color: "var(--accent-blue)", fontSize: 13, textDecoration: "none", fontWeight: 600,
-        }}>
+        <Link 
+          href="/reports" 
+          className="px-4 py-2 bg-[rgba(88,166,255,0.1)] border border-[rgba(88,166,255,0.3)] rounded-lg text-accent-blue text-[13px] font-semibold no-underline hover:bg-[rgba(88,166,255,0.15)] transition-colors"
+        >
           ✦ AI 보고서 생성
         </Link>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 16 }}>
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4">
         {/* Risk Scorecard */}
-        <Card style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-          <p style={{ margin: "0 0 16px", fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8 }}>
+        <Card className="flex flex-col items-center justify-center">
+          <p className="m-0 mb-4 text-xs font-semibold text-text-muted uppercase tracking-[0.8px]">
             종합 리스크 스코어카드
           </p>
           <RiskGauge cvss={data.cvss} epss={data.epss} kev={data.kev} size={180} />
@@ -82,21 +205,20 @@ export default async function RiskDetailPage({ params }: { params: Promise<{ id:
         {/* Vulnerability Description */}
         <Card>
           <CardHeader title="취약점 개요" />
-          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.8, color: "var(--text-secondary)" }}>{data.description}</p>
+          <p className="m-0 text-sm leading-[1.8] text-text-secondary">{data.description}</p>
 
-          <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-2.5">
             {[
               { label: "IP Address", value: data.ip },
               { label: "Service",    value: data.service },
               { label: "KEV Status", value: data.kev ? "⚠ 실제 악용 중" : "미등재", danger: data.kev },
             ].map(({ label, value, danger }) => (
-              <div key={label} style={{
-                background: "var(--bg-surface)", borderRadius: 8,
-                border: `1px solid ${danger ? "rgba(255,77,79,0.25)" : "var(--border)"}`,
-                padding: "10px 14px",
-              }}>
-                <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 }}>{label}</div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: danger ? "var(--risk-critical)" : "var(--text-primary)", fontFamily: label === "IP Address" ? "monospace" : "inherit" }}>
+              <div 
+                key={label} 
+                className={`bg-bg-surface rounded-lg border p-2.5 ${danger ? 'border-[rgba(255,77,79,0.25)]' : 'border-border'}`}
+              >
+                <div className="text-[10px] text-text-muted uppercase tracking-[0.8px] mb-1">{label}</div>
+                <div className={`text-[13px] font-semibold ${danger ? 'text-risk-critical' : 'text-text-primary'} ${label === "IP Address" ? "font-mono" : ""}`}>
                   {value}
                 </div>
               </div>
@@ -108,40 +230,47 @@ export default async function RiskDetailPage({ params }: { params: Promise<{ id:
       {/* Port & Service Info */}
       <Card>
         <CardHeader title="포트 및 서비스 정보" subtitle="Nmap 스캔 결과" />
-        <table>
-          <thead>
-            <tr>
-              <th>Port</th><th>Protocol</th><th>Service</th><th>Version</th><th>State</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.ports.map((p) => (
-              <tr key={p.port}>
-                <td style={{ fontFamily: "monospace", fontWeight: 700, color: "var(--accent-cyan)" }}>{p.port}</td>
-                <td>{p.protocol}</td>
-                <td style={{ color: "var(--text-primary)" }}>{p.service}</td>
-                <td style={{ fontFamily: "monospace", fontSize: 12 }}>{p.version}</td>
-                <td><span style={{ color: "var(--risk-low)", fontSize: 12, fontWeight: 600 }}>● {p.state}</span></td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr>
+                <th className="font-semibold text-[11px] uppercase tracking-[0.8px] text-text-muted pb-2 border-b border-border px-4">Port</th>
+                <th className="font-semibold text-[11px] uppercase tracking-[0.8px] text-text-muted pb-2 border-b border-border px-4">Protocol</th>
+                <th className="font-semibold text-[11px] uppercase tracking-[0.8px] text-text-muted pb-2 border-b border-border px-4">Service</th>
+                <th className="font-semibold text-[11px] uppercase tracking-[0.8px] text-text-muted pb-2 border-b border-border px-4">Version</th>
+                <th className="font-semibold text-[11px] uppercase tracking-[0.8px] text-text-muted pb-2 border-b border-border px-4">State</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {data.ports.map((p) => (
+                <tr key={p.port} className="border-b border-border-subtle hover:bg-bg-hover transition-colors">
+                  <td className="py-3 px-4 font-mono font-bold text-accent-cyan">{p.port}</td>
+                  <td className="py-3 px-4 text-text-secondary">{p.protocol}</td>
+                  <td className="py-3 px-4 text-text-primary">{p.service}</td>
+                  <td className="py-3 px-4 font-mono text-xs text-text-secondary">{p.version}</td>
+                  <td className="py-3 px-4"><span className="text-risk-low text-xs font-semibold">● {p.state}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Card>
 
       {/* CVE List */}
       <Card>
         <CardHeader title="관련 CVE 목록" />
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div className="flex flex-col gap-2.5">
           {data.cveList.map((c) => (
-            <div key={c.id} style={{
-              background: "var(--bg-surface)", borderRadius: 8,
-              border: "1px solid var(--border)", padding: "12px 16px",
-              display: "flex", alignItems: "center", gap: 14,
-            }}>
-              <span style={{ fontFamily: "monospace", fontSize: 13, color: "var(--accent-blue)", minWidth: 140 }}>{c.id}</span>
+            <div 
+              key={c.id} 
+              className="bg-bg-surface rounded-lg border border-border p-3 flex flex-wrap md:flex-nowrap items-center gap-3.5"
+            >
+              <span className="font-mono text-[13px] text-accent-blue min-w-[140px]">{c.id}</span>
               <Badge level={levelFromScore(c.cvss)} />
-              <span style={{ fontSize: 13, color: "var(--text-secondary)", flex: 1 }}>{c.summary}</span>
-              <span style={{ fontSize: 20, fontWeight: 800, color: c.cvss >= 9 ? "var(--risk-critical)" : "var(--risk-high)" }}>{c.cvss.toFixed(1)}</span>
+              <span className="text-[13px] text-text-secondary flex-1">{c.summary}</span>
+              <span className={`text-xl font-extrabold ${c.cvss >= 9 ? 'text-risk-critical' : 'text-risk-high'}`}>
+                {c.cvss.toFixed(1)}
+              </span>
             </div>
           ))}
         </div>

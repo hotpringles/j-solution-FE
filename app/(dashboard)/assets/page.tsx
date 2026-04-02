@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Badge, levelFromScore } from "@/components/ui/Badge";
 import { Card, CardHeader } from "@/components/ui/Card";
+import { Pagination } from "@/components/ui/Pagination";
 
 const ASSETS = [
   { id: "1",  subdomain: "api.example.com",     ip: "203.0.113.10", port: 443,  service: "HTTPS",  cvss: 9.8,  status: "open" },
@@ -14,17 +15,24 @@ const ASSETS = [
   { id: "6",  subdomain: "mail.example.com",    ip: "203.0.113.80", port: 993,  service: "IMAPS",   cvss: 5.3, status: "open" },
   { id: "7",  subdomain: "stage.example.com",   ip: "10.0.1.20",    port: 443,  service: "HTTPS",   cvss: 4.9, status: "filtered" },
   { id: "8",  subdomain: "cdn.example.com",     ip: "203.0.113.99", port: 80,   service: "HTTP",    cvss: 3.2, status: "open" },
-  { id: "9",  subdomain: "docs.example.com",    ip: "203.0.113.12", port: 443,  service: "HTTPS",   cvss: 2.1, status: "open" },
-  { id: "10", subdomain: "static.example.com",  ip: "203.0.113.15", port: 443,  service: "HTTPS",   cvss: 0,   status: "open" },
+  { id: "9",  subdomain: "auth.example.com",    ip: "10.0.1.22",    port: 443,  service: "OAuth Proxy", cvss: 3.1, status: "open" },
+  { id: "10", subdomain: "files.example.com",   ip: "203.0.113.11", port: 445,  service: "SMB",     cvss: 2.1, status: "open" },
+  { id: "11", subdomain: "proxy.example.com",   ip: "203.0.113.19", port: 80,   service: "HAProxy", cvss: 8.2, status: "open" },
+  { id: "12", subdomain: "backup.example.com",  ip: "10.0.1.66",    port: 873,  service: "Rsync",   cvss: 6.8, status: "open" },
+  { id: "13", subdomain: "test.example.com",    ip: "203.0.113.88", port: 9229, service: "Node.js", cvss: 4.5, status: "open" },
+  { id: "14", subdomain: "portal.example.com",  ip: "203.0.113.44", port: 443,  service: "HTTPS",   cvss: 0,   status: "open" },
+  { id: "15", subdomain: "static.example.com",  ip: "203.0.113.15", port: 443,  service: "HTTPS",   cvss: 0,   status: "open" },
 ];
 
 type FilterLevel = "all" | "critical" | "high" | "medium" | "low";
+const ITEMS_PER_PAGE = 6;
 
 export default function AssetsPage() {
   const [domain, setDomain]     = useState("");
   const [scanning, setScanning] = useState(false);
   const [filter, setFilter]     = useState<FilterLevel>("all");
   const [search, setSearch]     = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const handleScan = () => {
     if (!domain) return;
@@ -39,43 +47,45 @@ export default function AssetsPage() {
     return matchSearch && matchFilter;
   });
 
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
+  const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
   return (
     <>
       <div>
-        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: "var(--text-primary)" }}>Asset Discovery</h1>
-        <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--text-muted)" }}>도메인 스캔 파이프라인 제어 및 수집된 외부 자산 관리</p>
+        <h1 className="m-0 text-[22px] font-bold text-text-primary">Asset Discovery</h1>
+        <p className="mt-1 mb-0 text-[13px] text-text-muted">도메인 스캔 파이프라인 제어 및 수집된 외부 자산 관리</p>
       </div>
 
       {/* Scan Input */}
       <Card>
         <CardHeader title="스캔 파이프라인 제어" subtitle="Nmap → Naabu → HTTPX 순서로 실행됩니다" />
-        <div style={{ display: "flex", gap: 10 }}>
+        <div className="flex gap-2.5">
           <input
             type="text"
             placeholder="example.com 또는 192.168.1.0/24"
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleScan()}
-            style={{ flex: 1 }}
+            className="flex-1"
           />
           <button
-            className={scanning ? "btn-danger" : "btn-primary"}
+            className={`${scanning ? "btn-danger" : "btn-primary"} whitespace-nowrap min-w-[110px]`}
             onClick={scanning ? () => setScanning(false) : handleScan}
-            style={{ whiteSpace: "nowrap", minWidth: 110 }}
           >
             {scanning ? "⬛ 중지" : "▶ 스캔 시작"}
           </button>
         </div>
 
         {scanning && (
-          <div style={{ marginTop: 14, padding: "12px 14px", background: "var(--bg-surface)", borderRadius: 8, border: "1px solid var(--border)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-              <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--risk-high)", display: "inline-block", animation: "pulse-glow 1s infinite" }} />
-              <span style={{ fontSize: 13, color: "var(--risk-high)", fontWeight: 600 }}>스캔 진행 중...</span>
+          <div className="mt-3.5 px-3.5 py-3 bg-bg-surface rounded-lg border border-border">
+            <div className="flex items-center gap-2.5 mb-2">
+              <span className="w-2 h-2 rounded-full bg-risk-high inline-block animate-[pulse-glow_1s_infinite]" />
+              <span className="text-[13px] text-risk-high font-semibold">스캔 진행 중...</span>
             </div>
-            <div style={{ display: "flex", gap: 24, fontSize: 12, color: "var(--text-muted)" }}>
+            <div className="flex gap-6 text-xs text-text-muted">
               <span>✅ Naabu (포트 스캔)</span>
-              <span style={{ color: "var(--accent-blue)" }}>⟳ Nmap (서비스 탐지)</span>
+              <span className="text-accent-blue">⟳ Nmap (서비스 탐지)</span>
               <span>◻ HTTPX (HTTP 프로브)</span>
             </div>
           </div>
@@ -88,21 +98,19 @@ export default function AssetsPage() {
           title={`자산 목록 (${filtered.length}개)`}
           subtitle="수집된 외부 서브도메인 및 서비스"
           action={
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <div className="flex gap-2 items-center">
               <input
                 type="search"
                 placeholder="검색..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{ width: 160, padding: "6px 10px", fontSize: 12 }}
+                onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
+                className="w-40 px-2.5 py-1.5 text-xs"
               />
               {(["all","critical","high","medium","low"] as FilterLevel[]).map((f) => (
-                <button key={f} className="btn-ghost" onClick={() => setFilter(f)}
-                  style={{
-                    padding: "4px 10px", fontSize: 11,
-                    borderColor: filter === f ? "var(--accent-blue)" : "var(--border)",
-                    color: filter === f ? "var(--accent-blue)" : "var(--text-muted)",
-                  }}
+                <button 
+                  key={f} 
+                  className={`btn-ghost px-2.5 py-1 text-[11px] ${filter === f ? 'border-accent-blue text-accent-blue' : 'border-border text-text-muted'}`} 
+                  onClick={() => { setFilter(f); setCurrentPage(1); }}
                 >
                   {f.charAt(0).toUpperCase() + f.slice(1)}
                 </button>
@@ -110,50 +118,63 @@ export default function AssetsPage() {
             </div>
           }
         />
-        <div style={{ overflowX: "auto" }}>
-          <table>
+        <div className="overflow-x-auto min-h-[345px]">
+          <table className="w-full text-left border-collapse">
             <thead>
               <tr>
-                <th>Subdomain</th>
-                <th>IP Address</th>
-                <th>Port</th>
-                <th>Service</th>
-                <th>Status</th>
-                <th>CVSS</th>
-                <th>Risk</th>
-                <th></th>
+                <th className="font-semibold text-[11px] uppercase tracking-[0.8px] text-text-muted pb-2 border-b border-border">Subdomain</th>
+                <th className="font-semibold text-[11px] uppercase tracking-[0.8px] text-text-muted pb-2 border-b border-border">IP Address</th>
+                <th className="font-semibold text-[11px] uppercase tracking-[0.8px] text-text-muted pb-2 border-b border-border">Port</th>
+                <th className="font-semibold text-[11px] uppercase tracking-[0.8px] text-text-muted pb-2 border-b border-border">Service</th>
+                <th className="font-semibold text-[11px] uppercase tracking-[0.8px] text-text-muted pb-2 border-b border-border">Status</th>
+                <th className="font-semibold text-[11px] uppercase tracking-[0.8px] text-text-muted pb-2 border-b border-border">CVSS</th>
+                <th className="font-semibold text-[11px] uppercase tracking-[0.8px] text-text-muted pb-2 border-b border-border">Risk</th>
+                <th className="pb-2 border-b border-border"></th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((a) => (
-                <tr key={a.id}>
-                  <td style={{ color: "var(--text-primary)", fontWeight: 500 }}>{a.subdomain}</td>
-                  <td style={{ fontFamily: "monospace", fontSize: 12 }}>{a.ip}</td>
-                  <td style={{ fontFamily: "monospace", fontSize: 12 }}>{a.port}</td>
-                  <td>{a.service}</td>
-                  <td>
-                    <span style={{
-                      fontSize: 11, fontWeight: 600,
-                      color: a.status === "open" ? "var(--risk-low)" : "var(--text-muted)",
-                    }}>
+              {paginated.map((a) => (
+                <tr key={a.id} className="border-b border-border-subtle hover:bg-bg-hover transition-colors">
+                  <td className="py-3 pr-4 text-text-primary font-medium">{a.subdomain}</td>
+                  <td className="py-3 pr-4 font-mono text-xs">{a.ip}</td>
+                  <td className="py-3 pr-4 font-mono text-xs">{a.port}</td>
+                  <td className="py-3 pr-4">{a.service}</td>
+                  <td className="py-3 pr-4">
+                    <span className={`text-[11px] font-semibold ${a.status === "open" ? "text-risk-low" : "text-text-muted"}`}>
                       ● {a.status}
                     </span>
                   </td>
-                  <td style={{ color: "var(--text-primary)", fontWeight: 600 }}>{a.cvss > 0 ? a.cvss.toFixed(1) : "—"}</td>
-                  <td><Badge level={levelFromScore(a.cvss)} /></td>
-                  <td>
-                    <Link href={`/risk/${a.id}`} style={{
-                      fontSize: 11, color: "var(--text-primary)", textDecoration: "none",
-                      padding: "3px 8px", border: "1px solid rgba(0,199,169,0.35)", borderRadius: 4,
-                    }}>
-                      분석 →
-                    </Link>
+                  <td className="py-3 pr-4 text-text-primary font-semibold">{a.cvss > 0 ? a.cvss.toFixed(1) : "—"}</td>
+                  <td className="py-3 pr-4"><Badge level={levelFromScore(a.cvss)} /></td>
+                  <td className="py-3 pl-4 text-right">
+                    {a.cvss > 0 ? (
+                      <Link href={`/risk/${a.id}`} className="text-[11px] text-text-primary no-underline px-2 py-1 border border-[rgba(0,199,169,0.35)] rounded hover:bg-[rgba(0,199,169,0.1)] transition-colors inline-block whitespace-nowrap">
+                        분석 →
+                      </Link>
+                    ) : (
+                      <span className="text-[10px] text-text-muted px-2 py-1 uppercase tracking-[0.8px]">안전함</span>
+                    )}
                   </td>
                 </tr>
               ))}
+              {paginated.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="py-8 text-center text-text-muted text-sm">
+                    해당 조건의 자산이 없습니다.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
+        
+        {totalPages > 1 && (
+          <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </Card>
     </>
   );

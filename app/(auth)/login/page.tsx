@@ -1,4 +1,4 @@
-"use client"; // 사용자 상호작용(버튼 클릭, 라우팅)이 필요하므로 클라이언트 컴포넌트로 선언
+"use client";
 
 import { useRouter } from "next/navigation";
 
@@ -6,62 +6,61 @@ export default function LoginPage() {
   const router = useRouter();
 
   const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault(); // 폼 제출 시 새로고침 방지
-    // 실제로는 여기서 서버로 아이디/비밀번호를 보내 검증합니다.
-    // 지금은 UI 구현 단계이므로 바로 대시보드로 이동시킵니다.
+    e.preventDefault();
     document.cookie = "isLoggedIn=true; path=/;";
     router.push("/");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <div className="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full border border-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-bg-base px-4">
+      <div className="bg-bg-card p-8 rounded-2xl shadow-2xl max-w-md w-full border border-border">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Security Admin</h1>
-          <p className="text-gray-500 mt-2 text-sm">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#00C7A9]/10 mb-4 border border-[rgba(0,199,169,0.2)] shadow-[0_0_20px_rgba(0,199,169,0.15)]">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-8 h-8 text-accent-blue" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h1 className="text-2xl font-extrabold text-text-primary tracking-tight">Security Admin</h1>
+          <p className="text-text-muted mt-2 text-[13px]">
             대시보드에 접근하려면 로그인하세요.
           </p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-2">
+        <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-semibold text-text-secondary uppercase tracking-[0.8px] mb-1.5">
               이메일
             </label>
             <input
               type="email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+              className="w-full placeholder:text-text-muted/50"
               placeholder="admin@example.com"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-xs font-semibold text-text-secondary uppercase tracking-[0.8px] mb-1.5">
               비밀번호
             </label>
             <input
               type="password"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+              className="w-full placeholder:text-text-muted/50"
               placeholder="••••••••"
               required
             />
           </div>
-          <div>
+          <div className="pt-2">
+            <button type="submit" className="btn-primary w-full py-2.5 text-[15px]">
+              로그인
+            </button>
             <button
-            type="submit"
-            className="w-full bg-slate-900 text-white font-medium py-2.5 rounded-lg hover:bg-slate-800 transition-colors mt-6"
-          >
-            로그인
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push("/signup")}
-            className="w-full bg-slate-900 text-white font-medium py-2.5 rounded-lg hover:bg-slate-800 transition-colors mt-3"
-          >
-            회원가입
-          </button>
+              type="button"
+              onClick={() => router.push("/signup")}
+              className="btn-ghost w-full py-2.5 mt-3 text-[14px]"
+            >
+              회원가입
+            </button>
           </div>
-          
         </form>
       </div>
     </div>

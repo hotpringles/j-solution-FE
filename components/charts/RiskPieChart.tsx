@@ -41,6 +41,20 @@ function CustomLabel({ cx = 0, cy = 0, midAngle = 0, innerRadius = 0, outerRadiu
   );
 }
 
+const CustomTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const entry = payload[0];
+    return (
+      <div className="bg-bg-surface border border-border rounded-lg text-[13px] p-2.5 shadow-md flex items-center gap-2">
+        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.payload.fill }} />
+        <span className="text-text-secondary capitalize">{entry.name}:</span>
+        <span className="font-bold text-text-primary">{entry.value}</span>
+      </div>
+    );
+  }
+  return null;
+};
+
 export function RiskPieChart() {
   return (
     <ResponsiveContainer width="100%" height={240}>
@@ -61,15 +75,11 @@ export function RiskPieChart() {
             <Cell key={entry.name} fill={COLORS[entry.name as keyof typeof COLORS]} />
           ))}
         </Pie>
-        <Tooltip
-          contentStyle={{ background: "var(--bg-surface)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 13 }}
-          labelStyle={{ color: "var(--text-primary)" }}
-          itemStyle={{ color: "var(--text-secondary)" }}
-        />
+        <Tooltip content={<CustomTooltip />} />
         <Legend
           iconType="circle"
           iconSize={8}
-          wrapperStyle={{ fontSize: 12 }}
+          wrapperStyle={{ fontSize: 12, color: "var(--text-secondary)" }}
         />
       </PieChart>
     </ResponsiveContainer>

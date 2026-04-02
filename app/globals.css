@@ -1,30 +1,51 @@
 @import "tailwindcss";
 
-/* =============================================
-   Design Tokens — Dark Mode Security Dashboard
-   ============================================= */
+@theme {
+  --color-bg-base: #0d1117;
+  --color-bg-surface: #161b22;
+  --color-bg-card: #1c2333;
+  --color-bg-hover: #21262d;
+  --color-border: #30363d;
+  --color-border-subtle: #21262d;
+
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #b0bec5;
+  --color-text-muted: #546e7a;
+
+  --color-accent-blue: #00C7A9;
+  --color-accent-cyan: #33d9c0;
+  --color-accent-purple: #00a88e;
+
+  --color-risk-critical: #ff4d4f;
+  --color-risk-high: #fa8c16;
+  --color-risk-medium: #fadb14;
+  --color-risk-low: #52c41a;
+  --color-risk-info: #00C7A9;
+}
+
 :root {
-  --bg-base:    #0d1117;
-  --bg-surface: #161b22;
-  --bg-card:    #1c2333;
-  --bg-hover:   #21262d;
-  --border:     #30363d;
-  --border-subtle: #21262d;
+  --bg-base:    var(--color-bg-base);
+  --bg-surface: var(--color-bg-surface);
+  --bg-card:    var(--color-bg-card);
+  --bg-hover:   var(--color-bg-hover);
+  --border:     var(--color-border);
+  --border-subtle: var(--color-border-subtle);
 
-  --text-primary:   #ffffff;
-  --text-secondary: #b0bec5;
-  --text-muted:     #546e7a;
+  --text-primary:   var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-muted:     var(--color-text-muted);
 
-  --accent-blue:    #00C7A9;
-  --accent-cyan:    #33d9c0;
-  --accent-purple:  #00a88e;
+  --accent-blue:    var(--color-accent-blue);
+  --accent-cyan:    var(--color-accent-cyan);
+  --accent-purple:  var(--color-accent-purple);
 
-  --risk-critical: #ff4d4f;
-  --risk-high:     #fa8c16;
-  --risk-medium:   #fadb14;
-  --risk-low:      #52c41a;
-  --risk-info:     #00C7A9;
+  --risk-critical: var(--color-risk-critical);
+  --risk-high:     var(--color-risk-high);
+  --risk-medium:   var(--color-risk-medium);
+  --risk-low:      var(--color-risk-low);
+  --risk-info:     var(--color-risk-info);
 
+  /* Retaining some non-color variables that Tailwind doesn't process directly or are used manually */
   --glow-blue:   0 0 20px rgba(0,199,169,0.18);
   --glow-red:    0 0 20px rgba(255,77,79,0.2);
   --glow-cyan:   0 0 20px rgba(0,199,169,0.18);
